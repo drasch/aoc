@@ -1,5 +1,5 @@
 # aoc2020
 
-These are my solutions to the Advent of Code 2020 problems
+These are my solutions to the Advent of Code problems
 
-<https://adventofcode.com/2020/>
+<https://adventofcode.com/>
