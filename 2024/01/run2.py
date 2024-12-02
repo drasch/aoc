@@ -13,5 +13,5 @@ with open("input") as file:
 nums_count2 = Counter(nums2)
 
 
-#print(sum([n1*nums_count2[n1] for n1 in nums1]))
-print(sum([n1*nums2.count(n1) for n1 in nums1]))
+print(sum([n1*nums_count2[n1] for n1 in nums1]))
+#print(sum([n1*nums2.count(n1) for n1 in nums1]))
