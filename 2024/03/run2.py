@@ -15,9 +15,10 @@ with open("input") as file:
 
 
 def is_enabled(match, line):
-    command_re = r"|".join(map(re.escape, ["do()"[::-1], "don't()"[::-1]]))
-    disabler = re.search(command_re, line[match.start() :: -1])
-    return (not disabler) or (disabler and disabler.group(0)[::-1] not in "don't()")
+    prev_line = line[: match.start()]
+    dont = prev_line.rfind("don't()")
+    do = prev_line.rfind("do()")
+    return do >= dont
 
 
 line = "".join(lines)
