@@ -29,8 +29,8 @@ def get_string(lines, pos, kernel, match):
         yend = pos[1] + kernel[1] * (len(match) - 1)
         if (
             min(xend, yend, *pos) < 0
-            or max(xend, pos[0]) > len(lines[0])
-            or max(yend, pos[1]) > len(lines)
+            or max(xend, pos[0]) >= len(lines[0])
+            or max(yend, pos[1]) >= len(lines)
         ):
             return False
         return match == "".join(
