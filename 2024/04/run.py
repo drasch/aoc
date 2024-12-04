@@ -23,20 +23,17 @@ match = "XMAS"
 
 
 def get_string(lines, pos, kernel, match):
-    try:
-        xend = pos[0] + kernel[0] * (len(match) - 1)
-        yend = pos[1] + kernel[1] * (len(match) - 1)
-        if not 0 <= xend < len(lines[0]) or not 0 <= yend < len(lines):
-            return False
-
-        return match == "".join(
-            [
-                lines[pos[1] + (step * kernel[1])][pos[0] + (step * kernel[0])]
-                for step in range(len(match))
-            ]
-        )
-    except IndexError:
+    xend = pos[0] + kernel[0] * (len(match) - 1)
+    yend = pos[1] + kernel[1] * (len(match) - 1)
+    if not 0 <= xend < len(lines[0]) or not 0 <= yend < len(lines):
         return False
+
+    return match == "".join(
+        [
+            lines[pos[1] + (step * kernel[1])][pos[0] + (step * kernel[0])]
+            for step in range(len(match))
+        ]
+    )
 
 
 print(
