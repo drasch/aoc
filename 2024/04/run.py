@@ -42,7 +42,7 @@ def get_string(lines, pos, kernel, match):
 print(
     sum(
         [
-            get_string(lines, (x, y), kernel, "XMAS")
+            get_string(lines, (x, y), kernel, match)
             for x in range(len(lines[0]))
             for y in range(len(lines))
             for kernel in kernels
