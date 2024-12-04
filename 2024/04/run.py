@@ -1,5 +1,3 @@
-import itertools
-
 with open("input") as file:
     lines = [line.strip() for line in file.readlines()]
 
