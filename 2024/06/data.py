@@ -63,10 +63,9 @@ class Grid:
 
     @property
     def blocked(self):
-        return (
-            self.pos_in_bounds(self.next_move)
-            and self.grid[self.next_move[0]][self.next_move[1]] == "#"
-        )
+        return self.pos_in_bounds(self.next_move) and self.grid[self.next_move[0]][
+            self.next_move[1]
+        ] in ("#", "O")
 
     def pos_in_bounds(self, pos):
         return pos[0] in range(0, self.height) and pos[1] in range(0, self.width)
@@ -85,6 +84,18 @@ class Grid:
             self.move()
         print(moves)
         return len(moves)
+
+    def run_check_loop(self, steps=5000):
+        moves = set()
+        while self.pos_in_bounds(self.pos) or steps == 0:
+            steps -= 1
+            print(self.pos)
+            moves.add(self.pos)
+            while self.blocked:
+                self.turn_right()
+            self.move()
+        print(moves)
+        return steps == 0
 
     def __repr__(self):
         return f"<Grid pos={self.pos} height={self.height} width={self.width} direction={self.move_direction}>"
@@ -155,8 +166,11 @@ def test_blocked():
     assert not grid_sample.blocked
 
 
-with open("input") as file:
-    grid = Grid(file)
+def file_grid():
+    with open("input") as file:
+        grid = Grid(file)
+        return grid
+
 
 grid_sample = Grid(grid_data_test)
 
@@ -164,4 +178,4 @@ __all__ = ["grid", "test_grid"]
 
 if __name__ == "__main__":
     print(grid_sample.run())
-    print(grid.run())
+    print(file_grid().run())
