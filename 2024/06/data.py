@@ -164,3 +164,4 @@ __all__ = ["grid", "test_grid"]
 
 if __name__ == "__main__":
     print(grid_sample.run())
+    print(grid.run())
