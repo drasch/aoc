@@ -20,12 +20,12 @@ class Calibrator:
 
     def try_sum(self, target, operands):
         concat = lambda x, y: int(str(x) + str(y))
-        operations_set = [(add, mul, concat)] * (len(operands) - 1)
-        operations_set = map(deque, product(*operations_set))
+        operations_choices = [(add, mul, concat)] * (len(operands) - 1)
+        operations_permutations = map(deque, product(*operations_choices))
 
         return target in [
             reduce(lambda x, y: operations.popleft()(x, y), operands)
-            for operations in operations_set
+            for operations in operations_permutations
         ]
 
     def try_all(self):
@@ -39,5 +39,7 @@ class Calibrator:
 
 
 if __name__ == "__main__":
+    c = Calibrator("input.test")
+    print(c.try_all())
     c = Calibrator("input")
     print(c.try_all())
