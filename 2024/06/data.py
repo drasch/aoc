@@ -16,7 +16,6 @@ class Grid:
 
     def __init__(self, data_iter):
         self.grid = []
-        self.turns = []
         for line in data_iter:
             line = line.strip()
             if not line or not len(line):
@@ -82,15 +81,9 @@ class Grid:
         while self.pos_in_bounds(self.pos) and (limit < 0 or limit > 0):
             self.moves[self.pos] += 1
 
-            if len(last) > 2:
-                last.popleft()
-            last.append(self.moves[self.pos])
-            if self.moves[self.pos] > 3 or len(set(last)) == 1 and last[0] > 3:
-                print("breaking")
+            if self.moves[self.pos] > 4:
                 return -1
 
-            if self.blocked:
-                self.turns.append(self.pos)
             while self.blocked:
                 self.turn_right()
             self.move()
@@ -166,6 +159,8 @@ def test_out():
 
 def test_cycle():
     grid_sample = Grid(grid_data_test)
+    assert grid_sample.run() != -1
+    grid_sample = Grid(grid_data_test)
     grid_sample.block((6, 3))
     assert grid_sample.run() == -1
 
@@ -205,77 +200,31 @@ def cmp(a, b):
     return (a > b) - (a < b)
 
 
-def not_run_block_scenarios(turns):
-    ct = 0
-    for steps in sliding_window(turns, 3):
-        ys = Counter([pos[0] for pos in steps])
-        xs = Counter([pos[1] for pos in steps])
-        print(steps)
-        print(xs)
-        print(ys)
-
-        if len(xs) == 2 and len(ys) == 2:
-            # complete the square!
-            for key in xs.keys():
-                if xs[key] == 1:
-                    x = key
-                    break
-            for key in ys.keys():
-                if ys[key] == 1:
-                    y = key
-                    break
-            print(x)
-            print(y)
-            block = (y + cmp(y, steps[2][0]), x + cmp(x, steps[2][1]))
-            grid = file_grid()
-            if grid.grid[block[0]][block[1]] != ".":
-                continue
-            grid.block(block)
-            if grid.run_check_loop():
-                ct += 1
-                break
-    return ct
-
-
-def brute_run_block_scenarios():
-    grid = file_grid()
-    ct = 0
-    for y in range(grid.height):
-        for x in range(grid.width):
-            grid = file_grid()
-            if grid.grid[y][x] != ".":
-                continue
-            grid.block((y, x))
-            if grid.run_check_loop():
-                ct += 1
-        print(f"ct: {ct}")
-    return ct
-
-
-def run_block_scenarios(moves):
+def run_block_scenarios(moves, file_grid=file_grid):
     grid_orig = file_grid()
     moves = set(moves.keys())
 
     ct = 0
-    for spot in list(moves):
-        for y, x in [
-            (spot[0] + d[0], spot[1] + d[1])
-            for d in grid_orig.directions
-            if (spot[0] + d[0], spot[1] + d[1]) not in moves
-        ]:
-            moves.add((y, x))
-            grid = file_grid()
-            if grid.grid[y][x] != ".":
-                continue
-            grid.block((y, x))
-            if grid.run(10000) == -1:
-                print(f"ct: {ct}")
-                ct += 1
+    for y, x in list(moves):
+
+        grid = file_grid()
+        # if not grid.pos_in_bounds((y,x)) or grid.grid[y][x] != ".":
+        #     continue
+
+        grid.block((y, x))
+        if grid.run(10000) == -1:
+            ct += 1
+
     print(f"ct: {ct}")
     return ct
 
 
 __all__ = ["grid", "test_grid"]
+
+
+def gen_grid_sample():
+    return Grid(grid_data_test)
+
 
 if __name__ == "__main__":
     print(grid_sample.run())
