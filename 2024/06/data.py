@@ -87,18 +87,25 @@ class Grid:
 
     def run_check_loop(self, steps=5000):
         moves = set()
-        while self.pos_in_bounds(self.pos) or steps == 0:
+        while self.pos_in_bounds(self.pos) and steps != 0:
             steps -= 1
-            print(self.pos)
             moves.add(self.pos)
             while self.blocked:
                 self.turn_right()
             self.move()
-        print(moves)
         return steps == 0
+
+    def block(self, pos):
+        self.grid[pos[0]] = (
+            self.grid[pos[0]][: pos[1]] + "O" + self.grid[pos[0]][pos[1] + 1 :]
+        )
 
     def __repr__(self):
         return f"<Grid pos={self.pos} height={self.height} width={self.width} direction={self.move_direction}>"
+
+    def print_grid(self):
+        for i in range(self.height):
+            print(self.grid[i])
 
 
 grid_data_test = """....#.....
@@ -174,8 +181,25 @@ def file_grid():
 
 grid_sample = Grid(grid_data_test)
 
+
+def run_block_scenarios():
+    grid = file_grid()
+    ct = 0
+    for y in range(grid.height):
+        for x in range(grid.width):
+            grid = file_grid()
+            if grid.grid[y][x] != ".":
+                pass
+            grid.block((y, x))
+            if grid.run_check_loop():
+                ct += 1
+        print(ct)
+    return ct
+
+
 __all__ = ["grid", "test_grid"]
 
 if __name__ == "__main__":
     print(grid_sample.run())
     print(file_grid().run())
+    print(run_block_scenarios())
