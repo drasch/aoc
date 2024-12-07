@@ -11,7 +11,7 @@ class Grid:
     height: int
     pos: tuple[int, int]
     direction: int
-    directions = [(-1, 0), (0, 1), (-1, 0), (0, -1)]
+    directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
     def __init__(self, data_iter):
         self.grid = []
@@ -48,6 +48,12 @@ class Grid:
     def move_direction(self):
         return self.directions[self.direction]
 
+    def move(self):
+        if self.blocked:
+            raise GridException("tried to move while blocked!")
+
+        self.pos = self.next_move
+
     @property
     def next_move(self):
         return (
@@ -57,7 +63,10 @@ class Grid:
 
     @property
     def blocked(self):
-        return self.grid[self.next_move[0]][self.next_move[1]] == "#"
+        return (
+            self.pos_in_bounds(self.next_move)
+            and self.grid[self.next_move[0]][self.next_move[1]] == "#"
+        )
 
     def pos_in_bounds(self, pos):
         return pos[0] in range(0, self.height) and pos[1] in range(0, self.width)
@@ -65,6 +74,17 @@ class Grid:
     @property
     def in_bounds(self):
         return self.pos_in_bounds(self.pos)
+
+    def run(self):
+        moves = set()
+        while self.pos_in_bounds(self.pos):
+            print(self.pos)
+            moves.add(self.pos)
+            while self.blocked:
+                self.turn_right()
+            self.move()
+        print(moves)
+        return len(moves)
 
     def __repr__(self):
         return f"<Grid pos={self.pos} height={self.height} width={self.width} direction={self.move_direction}>"
@@ -113,6 +133,8 @@ def test_out():
     assert not grid_sample.in_bounds
     grid_sample.pos = (1, 9)
     assert grid_sample.in_bounds
+    grid_sample.pos = (0, 9)
+    assert grid_sample.in_bounds
     grid_sample.pos = (1, 10)
     assert not grid_sample.in_bounds
     grid_sample.pos = (10, 1)
@@ -125,6 +147,13 @@ def test_blocked():
     grid_sample.pos = (1, grid_sample.pos[1])
     assert grid_sample.blocked
 
+    # blocked words on edge -- not blocked
+    grid_sample.pos = (0, grid_sample.pos[1])
+    assert not grid_sample.blocked
+    grid_sample.pos = (0, grid_sample.width - 1)
+    grid_sample.turn_right()
+    assert not grid_sample.blocked
+
 
 with open("input") as file:
     grid = Grid(file)
@@ -132,3 +161,6 @@ with open("input") as file:
 grid_sample = Grid(grid_data_test)
 
 __all__ = ["grid", "test_grid"]
+
+if __name__ == "__main__":
+    print(grid_sample.run())
