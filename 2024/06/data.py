@@ -46,7 +46,6 @@ class Grid:
 
     @property
     def move_direction(self):
-        print(self.directions)
         return self.directions[self.direction]
 
     @property
@@ -58,16 +57,14 @@ class Grid:
 
     @property
     def blocked(self):
-        return (
-            self.pos[0] + self.move_direction[0],
-            self.pos[1] + self.move_direction[1],
-        )
+        return self.grid[self.next_move[0]][self.next_move[1]] == "#"
+
+    def pos_in_bounds(self, pos):
+        return pos[0] in range(0, self.height) and pos[1] in range(0, self.width)
 
     @property
     def in_bounds(self):
-        return self.pos[0] in range(0, self.height) and self.pos[1] in range(
-            0, self.width
-        )
+        return self.pos_in_bounds(self.pos)
 
     def __repr__(self):
         return f"<Grid pos={self.pos} height={self.height} width={self.width} direction={self.move_direction}>"
@@ -120,6 +117,13 @@ def test_out():
     assert not grid_sample.in_bounds
     grid_sample.pos = (10, 1)
     assert not grid_sample.in_bounds
+
+
+def test_blocked():
+    grid_sample = Grid(grid_data_test)
+    assert not grid_sample.blocked
+    grid_sample.pos = (1, grid_sample.pos[1])
+    assert grid_sample.blocked
 
 
 with open("input") as file:
