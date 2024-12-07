@@ -23,10 +23,12 @@ class Calibrator:
         operations_choices = [(add, mul, concat)] * (len(operands) - 1)
         operations_permutations = map(deque, product(*operations_choices))
 
-        return target in [
-            reduce(lambda x, y: operations.popleft()(x, y), operands)
-            for operations in operations_permutations
-        ]
+        return any(
+            (
+                target == reduce(lambda x, y: operations.popleft()(x, y), operands)
+                for operations in operations_permutations
+            )
+        )
 
     def try_all(self):
         return sum(
