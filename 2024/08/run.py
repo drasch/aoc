@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import combinations
 from typing import DefaultDict
 import string
 
@@ -33,7 +34,28 @@ class Grid:
                 assert self.width == len(line)
 
                 self.grid.append(line)
-            self.height = len(self.grid)
+        self.height = len(self.grid)
+
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.grid[y][x] in ANT_CHARS:
+                    self.antennae[self.grid[y][x]].append((y,x))
+        #print(self.antennae)
+
+    def find_antinode(self, pos1, pos2):
+        y = pos2[0]-pos1[0]
+        x = pos2[1]-pos1[1]
+
+        #print(pos1, pos2)
+        pos3 = (pos2[0]+y, pos2[1]+x)
+        pos4 = (pos1[0]-y, pos1[1]-x)
+        return [pos for pos in [pos3, pos4] if self.pos_in_bounds(pos)]
+
+
+    def find_antinodes(self):
+        for key, antennae in self.antennae.items():
+            for pos1, pos2 in combinations(antennae, 2):
+                print(pos1, pos2)
 
     def pos_in_bounds(self, pos: Position):
         return pos[0] in range(0, self.height) and pos[1] in range(0, self.width)
@@ -59,6 +81,32 @@ def test_grid_loader():
     assert grid_sample.height == 12
 
 
+def test_find_antinodes():
+    grid_sample = Grid("input.test")
+    pos1 = (4, 4)
+    pos2 = (5, 5)
+    pos3, pos4 = grid_sample.find_antinode(pos1, pos2)
+    assert pos3 == (6, 6)
+    assert pos4 == (3, 3)
+
+    pos1 = (5, 5)
+    pos2 = (4, 4)
+    pos3, pos4 = grid_sample.find_antinode(pos1, pos2)
+    assert pos4 == (6, 6)
+    assert pos3 == (3, 3)
+
+    pos1 = (5, 5)
+    pos2 = (7, 4)
+    pos3, pos4 = grid_sample.find_antinode(pos1, pos2)
+    assert pos3 == (9, 3)
+    assert pos4 == (3, 6)
+
+    pos1 = (3, 3)
+    pos2 = (5, 1)
+    (pos3,) = grid_sample.find_antinode(pos1, pos2)
+    assert pos3 == (1, 5)
+
+
 def test_out():
     grid_sample = Grid("input.test")
     assert not grid_sample.pos_in_bounds((-1, 4))
@@ -82,6 +130,6 @@ def grid_final() -> Grid:
 
 
 if __name__ == "__main__":
-    print(grid_sample().run())
-    grid = grid_final()
-    print(grid.run())
+    print(grid_sample().find_antinodes())
+    #grid = grid_final()
+    #print(grid.find_antinodes())
