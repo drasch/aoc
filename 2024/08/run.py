@@ -2,6 +2,7 @@ from collections import defaultdict
 from itertools import combinations
 from typing import DefaultDict
 import string
+from math import ceil
 
 ANT_CHARS = string.ascii_letters + string.digits
 
@@ -39,23 +40,56 @@ class Grid:
         for y in range(self.height):
             for x in range(self.width):
                 if self.grid[y][x] in ANT_CHARS:
-                    self.antennae[self.grid[y][x]].append((y,x))
-        #print(self.antennae)
+                    self.antennae[self.grid[y][x]].append((y, x))
+        # print(self.antennae)
 
-    def find_antinode(self, pos1, pos2):
-        y = pos2[0]-pos1[0]
-        x = pos2[1]-pos1[1]
+    def find_antinode(
+        self, pos1: Position, pos2: Position, part_2=False
+    ) -> list[Position]:
+        y = pos2[0] - pos1[0]
+        x = pos2[1] - pos1[1]
 
-        #print(pos1, pos2)
-        pos3 = (pos2[0]+y, pos2[1]+x)
-        pos4 = (pos1[0]-y, pos1[1]-x)
-        return [pos for pos in [pos3, pos4] if self.pos_in_bounds(pos)]
+        antinodes: list[Position] = []
 
+        start_d = 0 if part_2 else 1
 
-    def find_antinodes(self):
+        d = start_d
+        pos = pos2
+        while self.pos_in_bounds(pos):
+            pos = (pos2[0] + d * y, pos2[1] + d * x)
+            antinodes.append(pos)
+
+            if not part_2:
+                break
+            d += 1
+
+        d = start_d
+        pos = pos1
+        while self.pos_in_bounds(pos):
+            pos = (pos1[0] - d * y, pos1[1] - d * x)
+            antinodes.append(pos)
+            if not part_2:
+                break
+            d += 1
+
+        return [pos for pos in antinodes if self.pos_in_bounds(pos)]
+
+    def find_antinodes(self, part_2=False) -> int:
+        antinodes: list[Position] = list()
         for key, antennae in self.antennae.items():
             for pos1, pos2 in combinations(antennae, 2):
-                print(pos1, pos2)
+                morenodes = self.find_antinode(pos1, pos2, part_2)
+                antinodes += morenodes
+
+        antinodes_reduced = {
+            node
+            for node in antinodes
+            # if self.grid[node[0]][node[1]] == "."
+        }
+
+        # print(antinodes_reduced)
+
+        return len(antinodes_reduced)
 
     def pos_in_bounds(self, pos: Position):
         return pos[0] in range(0, self.height) and pos[1] in range(0, self.width)
@@ -131,5 +165,9 @@ def grid_final() -> Grid:
 
 if __name__ == "__main__":
     print(grid_sample().find_antinodes())
-    #grid = grid_final()
-    #print(grid.find_antinodes())
+    grid = grid_final()
+    print(grid.find_antinodes())
+
+    print(grid_sample().find_antinodes(part_2=True))
+    grid = grid_final()
+    print(grid.find_antinodes(part_2=True))
